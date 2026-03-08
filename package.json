@@ -5,7 +5,8 @@
     "main": "main.js",
     "scripts": {
         "dev": "mkdir -p dist && cp manifest.json styles.css dist/ && node esbuild.config.mjs dev",
-        "build": "node esbuild.config.mjs production && cp manifest.json styles.css dist/"
+        "build": "node esbuild.config.mjs production && cp manifest.json styles.css dist/",
+        "release": "node scripts/release.mjs"
     },
     "keywords": [
         "obsidian",
