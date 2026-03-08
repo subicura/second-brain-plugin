@@ -448,7 +448,8 @@ export default class SecondBrainPlugin extends Plugin {
                 const name = filePath.slice(folder.length + 1, -3);
                 const { frontmatter, body } = this.parseFrontmatter(raw);
                 const inputs = this.parseInputs(frontmatter);
-                return { name, promptTemplate: body, inputs } as ClaudeAction;
+                const description = typeof frontmatter.description === "string" ? frontmatter.description : "";
+                return { name, description, promptTemplate: body, inputs } as ClaudeAction;
             }),
         );
         return actions.sort((a, b) => a.name.localeCompare(b.name));

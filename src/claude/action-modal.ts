@@ -10,6 +10,7 @@ export interface PromptInput {
 
 export interface ClaudeAction {
     name: string;
+    description: string;
     promptTemplate: string;
     inputs: PromptInput[];
 }
@@ -33,6 +34,9 @@ export class ActionModal extends SuggestModal<ClaudeAction> {
 
     renderSuggestion(action: ClaudeAction, el: HTMLElement): void {
         el.createDiv({ text: action.name });
+        if (action.description) {
+            el.createDiv({ text: action.description, cls: "sb-action-description" });
+        }
     }
 
     onChooseSuggestion(action: ClaudeAction): void {
