@@ -2,7 +2,7 @@
     "id": "second-brain",
     "name": "SecondBrain",
     "author": "subicura",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "minAppVersion": "1.0.0",
     "description": "Git sync + Claude integration plugin for Obsidian",
     "isDesktopOnly": false
