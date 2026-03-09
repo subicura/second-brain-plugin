@@ -49,7 +49,7 @@ export class SecondBrainSettingTab extends PluginSettingTab {
             .setDesc("프롬프트 템플릿 파일이 있는 폴더 경로. 템플릿에서 {{content}}, {{fileName}} 사용 가능")
             .addSearch((cb) => {
                 new FolderSuggest(this.app, cb.inputEl);
-                cb.setPlaceholder("IO_SecondBrain/프롬프트")
+                cb.setPlaceholder("io-second-brain/프롬프트")
                     .setValue(this.plugin.settings.claudePromptFolder)
                     .onChange(async (value) => {
                         this.plugin.settings.claudePromptFolder = value;

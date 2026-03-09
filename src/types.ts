@@ -17,7 +17,7 @@ export const DEFAULT_SETTINGS: SecondBrainSettings = {
     disabledRepos: [],
     claudeEnabled: false,
     claudeModel: "sonnet",
-    claudePromptFolder: "IO_SecondBrain/프롬프트",
+    claudePromptFolder: "io-second-brain/프롬프트",
 };
 
 export interface RepoInfo {
