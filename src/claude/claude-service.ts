@@ -1,11 +1,12 @@
 import type { App } from "obsidian";
 import { FileSystemAdapter } from "obsidian";
 import { query as agentQuery } from "@anthropic-ai/claude-agent-sdk";
-import type { Options, Query } from "@anthropic-ai/claude-agent-sdk";
+import type { CanUseTool, Options, Query } from "@anthropic-ai/claude-agent-sdk";
 
 import type { ClaudeModel } from "../types";
 import { MessageChannel } from "./message-channel";
 import { findClaudeCLIPath, getEnhancedPath } from "./cli-resolver";
+import { PermissionModal } from "./permission-modal";
 
 export interface ChatCallbacks {
     onText: (text: string) => void;
@@ -44,12 +45,38 @@ export class ClaudeService {
 
         const enhancedPath = getEnhancedPath(cliPath);
 
+        let autoApprove = false;
+
+        const canUseTool: CanUseTool = async (toolName, input, { decisionReason }) => {
+            if (autoApprove) {
+                return { behavior: "allow", updatedInput: input };
+            }
+
+            const summary = this.getToolSummary(toolName, input);
+            const modal = new PermissionModal(
+                this.app,
+                toolName,
+                summary,
+                decisionReason ?? "",
+            );
+            const choice = await modal.prompt();
+
+            if (choice === "deny") {
+                return { behavior: "deny", message: "사용자가 거부했습니다." };
+            }
+            if (choice === "allow-all") {
+                autoApprove = true;
+            }
+            return { behavior: "allow", updatedInput: input };
+        };
+
         const options: Options = {
             cwd: vaultPath,
             model,
             abortController: this.abortController,
             pathToClaudeCodeExecutable: cliPath,
             permissionMode: "acceptEdits",
+            canUseTool,
             settingSources: ["user", "project"],
             maxTurns: 30,
             env: {

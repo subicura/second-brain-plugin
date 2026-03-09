@@ -18,6 +18,7 @@ export class ClaudeChatModal extends Modal {
     private currentAssistantEl: HTMLElement | null = null;
     private toolIndicatorEl: HTMLElement | null = null;
     private currentAssistantText = "";
+    private afterToolUse = false;
     private isStreaming = false;
     private renderComponent = new Component();
     private spinnerEl: HTMLElement | null = null;
@@ -135,6 +136,10 @@ export class ClaudeChatModal extends Modal {
                 this.hideLoadingIndicator();
                 this.removeToolIndicator();
                 this.hideSpinner();
+                if (this.afterToolUse && this.currentAssistantText) {
+                    this.currentAssistantText += "\n\n";
+                    this.afterToolUse = false;
+                }
                 this.currentAssistantText += text;
                 this.updateAssistantMessage(this.currentAssistantText);
                 this.showSpinner();
@@ -142,6 +147,7 @@ export class ClaudeChatModal extends Modal {
             onToolUse: (toolName: string, summary: string) => {
                 this.hideLoadingIndicator();
                 this.hideSpinner();
+                this.afterToolUse = true;
                 this.showToolIndicator(toolName, summary);
                 this.showSpinner();
             },
