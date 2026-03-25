@@ -165,22 +165,38 @@ export default class SecondBrainPlugin extends Plugin {
             });
         }
 
-        // Check direct children for .git directories (exclude submodules)
-        const rootList = await vault.adapter.list("");
-        for (const folder of rootList.folders) {
-            if (folder.startsWith(".")) continue;
-            const gitPath = folder + "/.git";
-            const hasGit = await vault.adapter.exists(gitPath + "/HEAD");
-            if (!hasGit) continue;
-            // Submodules have a .git *file* instead of a directory.
-            // Check .git/config exists to be sure it's a proper repo.
-            const hasConfig = await vault.adapter.exists(gitPath + "/config");
-            if (!hasConfig) continue;
-            const manager = await this.createManager(folder);
-            this.repos.push({
-                info: { path: folder, name: folder },
-                manager,
-            });
+        // Scan folders up to 3 levels deep for git repositories
+        let foldersToScan = [""];
+        const maxDepth = 3;
+
+        for (let depth = 0; depth < maxDepth; depth++) {
+            const nextFolders: string[] = [];
+            const listings = await Promise.all(
+                foldersToScan.map((parent) => vault.adapter.list(parent))
+            );
+            const allFolders = listings.flatMap((list) => list.folders);
+
+            for (const folder of allFolders) {
+                const folderName = folder.split("/").pop()!;
+                if (folderName.startsWith(".")) continue;
+
+                const gitPath = folder + "/.git";
+                const [hasGit, hasConfig] = await Promise.all([
+                    vault.adapter.exists(gitPath + "/HEAD"),
+                    vault.adapter.exists(gitPath + "/config"),
+                ]);
+
+                if (hasGit && hasConfig) {
+                    const manager = await this.createManager(folder);
+                    this.repos.push({
+                        info: { path: folder, name: folderName },
+                        manager,
+                    });
+                } else {
+                    nextFolders.push(folder);
+                }
+            }
+            foldersToScan = nextFolders;
         }
     }
 
