@@ -118,10 +118,11 @@ export class IsomorphicGitManager implements IGitManager {
         const repo = this.getRepo();
         try {
             for (const file of changedFiles) {
+                const filepath = file.path.normalize("NFC");
                 if (file.status === "deleted") {
-                    await git.remove({ ...repo, filepath: file.path });
+                    await git.remove({ ...repo, filepath });
                 } else {
-                    await git.add({ ...repo, filepath: file.path });
+                    await git.add({ ...repo, filepath });
                 }
             }
         } finally {

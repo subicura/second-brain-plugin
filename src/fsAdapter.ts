@@ -70,9 +70,9 @@ export class FsAdapter {
         const res = await this.adapter.list(path);
         const all = [...res.files, ...res.folders];
         if (path !== "/") {
-            return all.map((e) => normalizePath(e.substring(path.length)));
+            return all.map((e) => normalizePath(e.substring(path.length)).normalize("NFC"));
         }
-        return all;
+        return all.map((e) => e.normalize("NFC"));
     }
 
     async mkdir(path: string) {
